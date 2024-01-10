@@ -1,0 +1,6 @@
+rioxarray
+rasterio
+dash
+dash_bootstrap_components
+dash_leaflet
+jupyter_dash
