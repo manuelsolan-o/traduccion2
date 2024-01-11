@@ -6,7 +6,7 @@ import dash_bootstrap_components as dbc
 import ursa.dynamic_world as udw
 
 from components.page import new_page_layout
-from components.text import figureWithDescription, figureWithDescription_translation
+from components.text import figureWithDescription, figureWithDescription_translation,generate_drive_text_translation_land
 from dash import html, dcc, callback, Input, Output, State
 from datetime import datetime, timezone
 from layouts.common import generate_drive_text, generate_drive_text_translation
@@ -118,83 +118,84 @@ translations = {
         "pt": "O mapa exibe a categoria mais comum observada em 2022 para cada pixel de 10x10 metros. O relevo reflete a certeza do processo de classificação, onde uma maior altura indica uma maior certeza de que o pixel pertence à classe exibida. Note que as bordas entre as classes mostram maior incerteza."
     },
     
-    "HOW": {
+    #
+    "HOW-land": {
         "es": "La información procesada en la sección Cobertura de Suelo se realiza principalmente mediante de Google Earth Engine. De esta manera, la descarga de los datos empleados, debido a su tamaño, es a través del Google Drive de la cuenta empleada en la autenticación de Google Earth Engine.",
         "en": "The information processed in the Soil Coverage section is primarily done through Google Earth Engine. Therefore, the download of the used data, due to its size, is through the Google Drive of the account used in the authentication of Google Earth Engine.",
         "pt": "As informações processadas na seção Cobertura do Solo são realizadas principalmente através do Google Earth Engine. Assim, o download dos dados utilizados, devido ao seu tamanho, é feito através do Google Drive da conta utilizada na autenticação do Google Earth Engine."
     },
-    "WHERE": {
+    "WHERE-land": {
         "es": "La descarga del raster con nombre 'dynamic_world_raster.tif' se hará al directorio raíz del Google Drive de la cuenta empleada.",
         "en": "The download of the raster named 'dynamic_world_raster.tif' will be made to the root directory of the Google Drive of the account used.",
         "pt": "O download do raster com o nome 'dynamic_world_raster.tif' será feito para o diretório raiz do Google Drive da conta utilizada."
     },
     
-    "generate-drive-text1": {
+    "generate-drive-text1-land": {
         "es": "Descarga de Datos",
         "en": "Data Download",
         "pt": "Download de Dados"
     },
-    "generate-drive-text2": {
+    "generate-drive-text2-land": {
         "es": "¿Cómo se realiza la descarga?",
         "en": "How is the download done?",
         "pt": "Como é feito o download?"
     },
-    "generate-drive-text3": {
+    "generate-drive-text3-land": {
         "es": "¿Dónde se descarga el archivo?",
         "en": "Where is the file downloaded?",
         "pt": "Onde o arquivo é baixado?"
     },
-    "generate-drive-text4": {
+    "generate-drive-text4-land": {
         "es": "¿Cuáles son los estados de la descarga?",
         "en": "What are the download states?",
         "pt": "Quais são os estados do download?"
     },
-    "generate-drive-text5": {
+    "generate-drive-text5-land": {
         "es": "Los estados de la tarea de descarga son los siguientes:",
         "en": "The download task states are as follows:",
         "pt": "Os estados da tarefa de download são os seguintes:"
     },
-    "generate-drive-text6": {
+    "generate-drive-text6-land": {
         "es": " - Pendiente en el cliente.",
         "en": " - Pending on the client.",
         "pt": " - Pendente no cliente."
     },
-    "generate-drive-text7": {
+    "generate-drive-text7-land": {
         "es": " - En cola en el servidor.",
         "en": " - Queued on the server.",
         "pt": " - Em fila no servidor."
     },
-    "generate-drive-text8": {
+    "generate-drive-text8-land": {
         "es": " - En ejecución.",
         "en": " - In execution.",
         "pt": " - Em execução."
     },
-    "generate-drive-text9": {
+    "generate-drive-text9-land": {
         "es": " - Completada exitosamente.",
         "en": " - Completed successfully.",
         "pt": " - Completado com sucesso."
     },
-    "generate-drive-text10": {
+    "generate-drive-text10-land": {
         "es": " - No completada debido a un error.",
         "en": " - Not completed due to an error.",
         "pt": " - Não concluído devido a um erro."
     },
-    "generate-drive-text11": {
+    "generate-drive-text11-land": {
         "es": " - En ejecución pero se ha solicitado su cancelación.",
         "en": " - In execution but its cancellation has been requested.",
         "pt": " - Em execução, mas seu cancelamento foi solicitado."
     },
-    "generate-drive-text12": {
+    "generate-drive-text12-land": {
         "es": " - Cancelada.",
         "en": " - Cancelled.",
         "pt": " - Cancelado."
     },
-    "generate-drive-text13": {
+    "generate-drive-text13-land": {
         "es": "¿Es posible hacer descargas simultáneas?",
         "en": "Is it possible to make simultaneous downloads?",
         "pt": "É possível fazer downloads simultâneos?"
     },
-    "generate-drive-text14": {
+    "generate-drive-text14-land": {
         "es": "URSA únicamente permite la ejecución de una tarea de descarga a la vez. Espere a que se complete la tarea antes de crear una nueva. Esto puede tomar varios minutos.",
         "en": "URSA only allows the execution of one download task at a time. Wait for the task to complete before creating a new one. This may take several minutes.",
         "pt": "URSA só permite a execução de uma tarefa de download por vez. Aguarde a conclusão da tarefa antes de criar uma nova. Isso pode levar vários minutos."
@@ -313,7 +314,7 @@ tabs = [
     ),
     dbc.Tab(
         [
-            generate_drive_text_translation(
+            generate_drive_text_translation_land(
                 how="La información procesada en la sección Cobertura de Suelo se realiza principalmente mediante de Google Earth Engine. De esta manera, la descarga de los datos empleados, debido a su tamaño, es a través del Google Drive de la cuenta empleada en la autenticación de Google Earth Engine.",
                 where="La descarga del raster con nombre 'dynamic_world_raster.tif' se hará al directorio raíz del Google Drive de la cuenta empleada.",
             ),
