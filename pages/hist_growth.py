@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 import ursa.ghsl as ghsl
 import ursa.utils.geometry as ug
 
-from components.text import figureWithDescription, figureWithDescription_translation
+from components.text import figureWithDescription, figureWithDescription_translation, figureWithDescription_translation2
 from components.text import mapComponent
 from components.page import new_page_layout
 from dash import html, dcc, callback, Input, Output
@@ -91,7 +91,7 @@ translations = {
     },
     "map-title-2": {
         "es": "Año en el que se considera celda urbana",
-        "en": "Year when the cell is considered urban",
+        "en": "Year when the cell was urbanized",
         "pt": "Ano em que a célula é considerada urbana"
     },
     "map-title-3": {
@@ -213,6 +213,18 @@ translations = {
         "es": "Algunas gráficas no pudieron ser generadas. Considere cambiar la bounding box de análisis.",
         "en": "Some charts could not be generated. Consider changing the bounding box for analysis.",
         "pt": "Alguns gráficos não puderam ser gerados. Considere mudar a caixa de delimitação para análise."
+    },
+    
+    "sub2": {
+        "es": "Superficie del Área Construida por Tipo de Urbanización (1975-2020)",
+        "en": "Built-Up Area Surface by Type of Urbanization (1975-2020)",
+        "pt": "Superfície da Área Construída por Tipo de Urbanização (1975-2020)"
+    },
+    
+    "sub3": {
+        "es": "Población Total del Área Urbana por Tipo de Urbanización (1975-2020)",
+        "en": "Total Population of the Urban Area by Type of Urbanization (1975-2020)",
+        "pt": "População Total da Área Urbana por Tipo de Urbanização (1975-2020)"
     }
     
 }
@@ -382,17 +394,18 @@ lines = html.Div(
         "sub1"  # ID título
         ),
         
-        figureWithDescription(
-            dcc.Graph(id="growth-lines-2"),
-            LINE_GRAPH_TEXT_2,
-            "Superficie del Área Construida por Tipo de Urbanización (1975-2020)",
+        figureWithDescription_translation2(
+           dcc.Graph(id="growth-lines-2"), 
+            ["LINE_GRAPH_TEXT_2_PART1", "GHSL", "LINE_GRAPH_TEXT_2_PART2"], 
+            "sub2"  
         ),
         
-        figureWithDescription(
-            dcc.Graph(id="growth-lines-3"),
-            LINE_GRAPH_TEXT_3,
-            "Población Total del Área Urbana por Tipo de Urbanización (1975-2020)",
+        figureWithDescription_translation2(
+            dcc.Graph(id="growth-lines-3"), 
+            ["GHSL", "LINE_GRAPH_TEXT_3"], 
+            "sub3"
         ),
+        
         figureWithDescription_translation(
         dcc.Graph(id="growth-lines-4"),
         "LINE_GRAPH_TEXT_4",  # ID descripción

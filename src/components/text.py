@@ -58,9 +58,13 @@ def figureWithDescription_translation(fig, text_id, title_id):
         style=BLOCK_STYLE,
     )
 
-def figureWithDescription_translation2(fig, description, title_id):
+def figureWithDescription_translation2(fig, text_ids, title_id):
     info_id = f"{title_id}-info"
-    tooltip = dbc.Tooltip(description, target=info_id, placement="top")
+    
+    text_elements = [html.Span(id=text_id) if text_id != "GHSL" else html.Acronym("GHSL", title="Global Human Settlement Layer") for text_id in text_ids]
+
+    tooltip = dbc.Tooltip(text_elements, target=info_id, placement="top")
+    
     info_button = html.I(id=info_id, className="bi bi-info-circle text-info")
     title_element = html.H4(id=title_id)
 
@@ -78,6 +82,7 @@ def figureWithDescription_translation2(fig, description, title_id):
         ],
         style=BLOCK_STYLE,
     )
+
 
 def mapComponent(title, id):
     return html.Div(
