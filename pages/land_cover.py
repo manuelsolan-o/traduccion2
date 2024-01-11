@@ -6,10 +6,10 @@ import dash_bootstrap_components as dbc
 import ursa.dynamic_world as udw
 
 from components.page import new_page_layout
-from components.text import figureWithDescription, figureWithDescription_translation,generate_drive_text_translation_land
+from components.text import figureWithDescription, figureWithDescription_translation
 from dash import html, dcc, callback, Input, Output, State
 from datetime import datetime, timezone
-from layouts.common import generate_drive_text, generate_drive_text_translation
+from layouts.common import generate_drive_text, generate_drive_text_translation, generate_drive_text_translation_land
 from pathlib import Path
 from shapely.geometry import shape
 
