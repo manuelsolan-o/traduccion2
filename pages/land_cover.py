@@ -219,6 +219,24 @@ translations = {
     
 }
 
+tab_translations = {
+    "tab-plots": {
+        "es": "Gráficas",
+        "en": "Charts",
+        "pt": "Gráficos"
+    },
+    "tab-info": {
+        "es": "Info",
+        "en": "Info",
+        "pt": "Informação"
+    },
+    "tabDownloadables": {
+        "es": "Descargables",
+        "en": "Downloadables",
+        "pt": "Descarregáveis"
+    }
+}
+
 
 path_fua = Path("./data/output/cities/")
 
@@ -314,7 +332,7 @@ tabs = [
     ),
     dbc.Tab(
         [
-            generate_drive_text_translation_land(
+            generate_drive_text_translation(
                 how="La información procesada en la sección Cobertura de Suelo se realiza principalmente mediante de Google Earth Engine. De esta manera, la descarga de los datos empleados, debido a su tamaño, es a través del Google Drive de la cuenta empleada en la autenticación de Google Earth Engine.",
                 where="La descarga del raster con nombre 'dynamic_world_raster.tif' se hará al directorio raíz del Google Drive de la cuenta empleada.",
             ),
@@ -353,6 +371,8 @@ tabs = [
             ),
         ],
         label="Descargables",
+        id = "tabDownloadables",
+        tab_id="tabDownloadables",
     ),
 ]
 
@@ -397,6 +417,28 @@ def update_translated_content(btn_lang_es, btn_lang_en, btn_lang_pt):
         language = 'es' if button_id == 'btn-lang-es' else 'en' if button_id == 'btn-lang-en' else 'pt'
 
     return [translations[key][language] for key in translations.keys()]
+
+# ---
+
+
+@callback(
+    [Output(key, 'label') for key in tab_translations.keys()], 
+    [Input('btn-lang-es', 'n_clicks'),
+     Input('btn-lang-en', 'n_clicks'),
+     Input('btn-lang-pt', 'n_clicks')]
+)
+def update_tab_labels(btn_lang_es, btn_lang_en, btn_lang_pt):
+    ctx = dash.callback_context
+
+    if not ctx.triggered:
+        language = 'es'  # Idioma predeterminado
+    else:
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        language = 'es' if button_id == 'btn-lang-es' else 'en' if button_id == 'btn-lang-en' else 'pt'
+
+    tab_labels = [tab_translations[key][language] for key in tab_translations.keys()]
+
+    return tab_labels  
 
 # ---
 
@@ -449,17 +491,27 @@ def download_rasters(n_intervals, task_name):
 
 
 @callback(
-    Output("cover-map-1", "figure"),
-    Output("cover-lines-1", "figure"),
-    Output("cover-lines-2", "figure"),
-    Output("lc-location", "pathname"),
-    Input("global-store-hash", "data"),
-    Input("global-store-bbox-latlon", "data"),
-    Input("global-store-fua-latlon", "data"),
+    [Output("cover-map-1", "figure"),
+     Output("cover-lines-1", "figure"),
+     Output("cover-lines-2", "figure"),
+     Output("lc-location", "pathname")],
+    [Input("global-store-hash", "data"),
+     Input("global-store-bbox-latlon", "data"),
+     Input("global-store-fua-latlon", "data"),
+     Input('btn-lang-es', 'n_clicks'),
+     Input('btn-lang-en', 'n_clicks'),
+     Input('btn-lang-pt', 'n_clicks')]
 )
-def generate_plots(id_hash, bbox_latlon, fua_latlon):
+def generate_plots(id_hash, bbox_latlon, fua_latlon, btn_lang_es, btn_lang_en, btn_lang_pt):
     if id_hash is None:
         return [dash.no_update] * 3 + ["/"]
+    
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        language = 'es'  # Idioma predeterminado
+    else:
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        language = 'es' if button_id == 'btn-lang-es' else 'en' if button_id == 'btn-lang-en' else 'pt'
 
     path_cache = Path(f"./data/cache/{id_hash}")
 
@@ -467,13 +519,13 @@ def generate_plots(id_hash, bbox_latlon, fua_latlon):
     fua_latlon = shape(fua_latlon)
 
     map1 = udw.plot_map_season(
-        bbox_latlon, fua_latlon.centroid, season="Qall", year=2022
+        bbox_latlon, fua_latlon.centroid, season="Qall", year=2022, language=language
     )
-    lines1 = udw.plot_lc_year(bbox_latlon, path_cache)
-    lines2 = udw.plot_lc_time_series(bbox_latlon, path_cache)
+    lines1 = udw.plot_lc_year(bbox_latlon, path_cache, year=2022, language=language)
+    lines2 = udw.plot_lc_time_series(bbox_latlon, path_cache, language=language)
+
 
     return map1, lines1, lines2, dash.no_update
-
 
 @callback(
     Output("lc-btn-stop-task", "style"),

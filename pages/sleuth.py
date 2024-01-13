@@ -633,6 +633,96 @@ translations2 = {
     }
 }
 
+tab_translations = {
+    "sleuth-tab-3": {
+        "es": "Resumen",
+        "en": "Summary",
+        "pt": "Resumo"
+    },
+    "Rasters-principal": {
+        "es": "Rasters",
+        "en": "Rasters",
+        "pt": "Rasters"
+    },
+    "Calibracion-principal": {
+        "es": "Calibración",
+        "en": "Calibration",
+        "pt": "Calibração"
+    },
+    "Prediccion-principal": {
+        "es": "Predicción",
+        "en": "Prediction",
+        "pt": "Previsão"
+    },
+    
+    # RASTER_FIELD_MAP
+    
+    "rasters-slope": {
+        "es": "Pendiente",
+        "en": "Slope",
+        "pt": "Declive"
+    },
+    "rasters-roads": {
+        "es": "Caminos",
+        "en": "Paths",
+        "pt": "Caminhos"
+    },
+    "rasters-excluded": {
+        "es": "Exclusión",
+        "en": "Exclusion",
+        "pt": "Exclusão"
+    },
+    "rasters-urban": {
+        "es": "Urbano",
+        "en": "Urban",
+        "pt": "Urbano"
+    },
+    
+    # Tab Calibracion
+    "parametros-calibracion": {
+        "es": "Parámetros",
+        "en": "Parameters",
+        "pt": "Parâmetros"
+    },
+    "espacio-calibracion": {
+        "es": "Espacio de búsqueda",
+        "en": "Search Space",
+        "pt": "Espaço de Busca"
+    },
+    "iniciar-calibracion": {
+        "es": "Iniciar",
+        "en": "Start",
+        "pt": "Iniciar"
+    },
+    "result-calibration-subtab": {
+        "es": "Resultados",
+        "en": "Results",
+        "pt": "Resultados"
+    },
+    
+    # Tab Prediccion
+    
+    "parametros-prediccion": {
+        "es": "Parámetros",
+        "en": "Parameters",
+        "pt": "Parâmetros"
+    },
+    "escenarios-prediccion": {
+        "es": "Escenarios",
+        "en": "Scenarios",
+        "pt": "Cenários"
+    },
+    "iniciar-prediccion": {
+        "es": "Iniciar",
+        "en": "Start",
+        "pt": "Iniciar"
+    },
+    "result-prediction-tabs": {
+        "es": "Resultados",
+        "en": "Results",
+        "pt": "Resultados"
+    }
+}
 
 
 RASTER_FIELDS = ["slope", "roads", "excluded", "urban"]
@@ -741,7 +831,8 @@ tab_slope = dbc.Tab(
             )
         )
     ],
-    label=RASTER_FIELD_MAP["slope"],
+    label="Pendiente",
+    id = "rasters-slope",
 )
 
 tab_roads = dbc.Tab(
@@ -833,7 +924,8 @@ tab_roads = dbc.Tab(
             )
         )
     ],
-    label=RASTER_FIELD_MAP["roads"],
+    label="Caminos",
+    id = "rasters-roads",
 )
 
 
@@ -926,7 +1018,8 @@ tab_excluded = dbc.Tab(
             )
         )
     ],
-    label=RASTER_FIELD_MAP["excluded"],
+    label="Exclusión",
+    id = "rasters-excluded",
 )
 
 
@@ -1019,7 +1112,8 @@ tab_urban = dbc.Tab(
             )
         )
     ],
-    label=RASTER_FIELD_MAP["urban"],
+    label="Urbano",
+    id = "rasters-urban",
 )
 
 subsubtabs = [tab_slope, tab_roads, tab_excluded, tab_urban]
@@ -1648,9 +1742,9 @@ tab1_content = dbc.Card(
     dbc.CardBody(
         dbc.Tabs(
             [
-                dbc.Tab(subtab_1, label="Parámetros"),
-                dbc.Tab(subtab_3, label="Espacio de búsqueda"),
-                dbc.Tab(subtab_5, label="Iniciar"),
+                dbc.Tab(subtab_1, label="Parámetros", id = "parametros-calibracion"),
+                dbc.Tab(subtab_3, label="Espacio de búsqueda", id = "espacio-calibracion"),
+                dbc.Tab(subtab_5, label="Iniciar", id = "iniciar-calibracion"),
                 dbc.Tab(
                     subtab_6,
                     label="Resultados",
@@ -1934,9 +2028,9 @@ tab2_content = dbc.Card(
     dbc.CardBody(
         dbc.Tabs(
             [
-                dbc.Tab(subtab_2_1, label="Parámetros"),
-                dbc.Tab(subtab_2_2, label="Escenarios"),
-                dbc.Tab(subtab_2_3, label="Iniciar"),
+                dbc.Tab(subtab_2_1, label="Parámetros", id = "parametros-prediccion"),
+                dbc.Tab(subtab_2_2, label="Escenarios", id = "escenarios-prediccion"),
+                dbc.Tab(subtab_2_3, label="Iniciar", id = "iniciar-prediccion"),
                 dbc.Tab(
                     subtab_2_4,
                     label="Resultados",
@@ -1955,9 +2049,9 @@ tab2_content = dbc.Card(
 tabs = dbc.Tabs(
     [
         dbc.Tab(label="Resumen", id="sleuth-tab-3"),
-        dbc.Tab(tab0_content, label="Rasters"),
-        dbc.Tab(tab1_content, label="Calibración"),
-        dbc.Tab(tab2_content, label="Predicción"),
+        dbc.Tab(tab0_content, label="Rasters", id = "Rasters-principal"),
+        dbc.Tab(tab1_content, label="Calibración", id = "Calibracion-principal"),
+        dbc.Tab(tab2_content, label="Predicción", id = "Prediccion-principal"),
     ]
 )
 
@@ -2052,6 +2146,28 @@ def update_translated_content2(btn_lang_es, btn_lang_en, btn_lang_pt):
         language = 'es' if button_id == 'btn-lang-es' else 'en' if button_id == 'btn-lang-en' else 'pt'
 
     return [translations2[key][language] for key in translations2.keys()]
+
+# ---
+
+@callback(
+    [Output(key, 'label') for key in tab_translations.keys()], 
+    [Input('btn-lang-es', 'n_clicks'),
+     Input('btn-lang-en', 'n_clicks'),
+     Input('btn-lang-pt', 'n_clicks')]
+)
+
+def update_tab_labels(btn_lang_es, btn_lang_en, btn_lang_pt):
+    ctx = dash.callback_context
+
+    if not ctx.triggered:
+        language = 'es'  # Idioma predeterminado
+    else:
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        language = 'es' if button_id == 'btn-lang-es' else 'en' if button_id == 'btn-lang-en' else 'pt'
+
+    tab_labels = [tab_translations[key][language] for key in tab_translations.keys()]
+
+    return tab_labels  
 
 # ---
 
@@ -2701,10 +2817,10 @@ def download_predicted_rasters(n_clicks, data, id_hash):
 
 
 @callback(
-    Output("container-parameters", "children", allow_duplicate=True),
+    Output("container-parameters", "children"),
     Input("btn-add-row", "n_clicks"),
-    State("container-parameters", "children"),
-    State({"type": "memory-orig-coefficient", "field": dash.ALL}, "data"),
+    [State("container-parameters", "children"),
+    State({"type": "memory-orig-coefficient", "field": dash.ALL}, "data"),],
     prevent_initial_call=True,
 )
 def add_parameter_row(n_clicks, children, orig_coefficients):
@@ -2724,6 +2840,7 @@ def add_parameter_row(n_clicks, children, orig_coefficients):
     new_children.append(dbc.Row(dbc.Col([html.Hr()])))
     new_children.append(children[-1])
     return new_children
+
 
 
 @callback(

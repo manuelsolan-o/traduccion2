@@ -390,6 +390,32 @@ translations = {
     }
 }
 
+tab_translations = {
+    
+    "tab-controls-suhi": {
+        "es": "Controles",
+        "en": "Controls",
+        "pt": "Controles"
+    },
+    
+    "tab-plots-suhi": {
+        "es": "Gráficas",
+        "en": "Charts",
+        "pt": "Gráficos"
+    },
+    "tab-info-suhi": {
+        "es": "Info",
+        "en": "Info",
+        "pt": "Informação"
+    },
+    "tabDownloadables-suhi": {
+        "es": "Descargables",
+        "en": "Downloadables",
+        "pt": "Descarregáveis"
+    }
+}
+
+
 start_time_suhi = None
 
 SEASON = "Qall"
@@ -935,19 +961,19 @@ tabs = [
             ],
         ),
         label="Controles",
-        id="tab-controls",
+        id="tab-controls-suhi",
         tab_id="tabControls",
     ),
     dbc.Tab(
         plots,
         label="Gráficas",
-        id="tab-plots",
+        id="tab-plots-suhi",
         tab_id="tabPlots",
     ),
     dbc.Tab(
         html.Div([welcomeAlert, mapIntroAlert]),
         label="Info",
-        id="tab-info",
+        id="tab-info-suhi",
         tab_id="tabInfo",
     ),
     dbc.Tab(
@@ -1004,6 +1030,7 @@ tabs = [
             ),
         ],
         label="Descargables",
+        id = "tabDownloadables-suhi",
     ),
 ]
 
@@ -1064,6 +1091,26 @@ def update_translated_content(btn_lang_es, btn_lang_en, btn_lang_pt):
 
 # ---
 
+@callback(
+    [Output(key, 'label') for key in tab_translations.keys()], 
+    [Input('btn-lang-es', 'n_clicks'),
+     Input('btn-lang-en', 'n_clicks'),
+     Input('btn-lang-pt', 'n_clicks')]
+)
+def update_tab_labels(btn_lang_es, btn_lang_en, btn_lang_pt):
+    ctx = dash.callback_context
+
+    if not ctx.triggered:
+        language = 'es'  # Idioma predeterminado
+    else:
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        language = 'es' if button_id == 'btn-lang-es' else 'en' if button_id == 'btn-lang-en' else 'pt'
+
+    tab_labels = [tab_translations[key][language] for key in tab_translations.keys()]
+
+    return tab_labels  
+
+# ---
 
 
 @callback(
@@ -1227,10 +1274,20 @@ def download_rasters(n_intervals, task_name):
     Input("global-store-bbox-latlon", "data"),
     Input("global-store-fua-latlon", "data"),
     Input("global-store-uc-latlon", "data"),
+    Input('btn-lang-es', 'n_clicks'),
+    Input('btn-lang-en', 'n_clicks'),
+    Input('btn-lang-pt', 'n_clicks'),
 )
-def generate_maps(id_hash, bbox_latlon, fua_latlon, uc_latlon):
+def generate_maps(id_hash, bbox_latlon, fua_latlon, uc_latlon, btn_lang_es, btn_lang_en, btn_lang_pt):
     if id_hash is None:
         return [dash.no_update] * 5
+    
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        language = 'es'  # Idioma predeterminado
+    else:
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        language = 'es' if button_id == 'btn-lang-es' else 'en' if button_id == 'btn-lang-en' else 'pt'
 
     path_cache = Path(f"./data/cache/{id_hash}")
 
@@ -1253,8 +1310,10 @@ def generate_maps(id_hash, bbox_latlon, fua_latlon, uc_latlon):
         temp_map = pht.plot_cat_map(
             bbox_ee, fua_latlon.centroid, img_cat
         )
-        areas_plot = pht.plot_temp_areas(df_t_areas)
-        temps_by_lc_plot = pht.plot_temp_by_lc(df_land_usage)
+        areas_plot = pht.plot_temp_areas(df_t_areas, language=language) # 
+        
+        temps_by_lc_plot = pht.plot_temp_by_lc(df_land_usage, language=language) #
+        
     except Exception as e:
         temp_map = dash.no_update
         areas_plot = dash.no_update
@@ -1262,8 +1321,8 @@ def generate_maps(id_hash, bbox_latlon, fua_latlon, uc_latlon):
 
     df_f, df_lc = ht.load_or_get_radial_distributions(bbox_latlon, uc_latlon, start_date, end_date, path_cache)
     
-    radial_temp_plot = pht.plot_radial_temperature(df_f)
-    radial_lc_plot = pht.plot_radial_lc(df_lc)
+    radial_temp_plot = pht.plot_radial_temperature(df_f, language=language) #
+    radial_lc_plot = pht.plot_radial_lc(df_lc, language=language) #
 
     return temp_map, areas_plot, temps_by_lc_plot, radial_temp_plot, radial_lc_plot
 

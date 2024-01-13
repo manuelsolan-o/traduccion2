@@ -195,6 +195,7 @@ def create_parameter_row(idx, parameters):
     return dbc.Row(cols, class_name="mb-2", id={"type": "row-parameters", "index": idx})
 
 
+
 def download_sleuth_predictions(path_cache, id_hash, mode):
     bucket = "tec-expansion-urbana-p"
     local_filename = f"{mode}.npy"

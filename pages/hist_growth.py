@@ -229,6 +229,25 @@ translations = {
     
 }
 
+tab_translations = {
+    "tab-plots-hist": {
+        "es": "Gráficas",
+        "en": "Charts",
+        "pt": "Gráficos"
+    },
+    "tab-info-hist": {
+        "es": "Info",
+        "en": "Info",
+        "pt": "Informação"
+    },
+    "tab-download-hist": {
+        "es": "Descargables",
+        "en": "Downloadables",
+        "pt": "Descarregáveis"
+    }
+}
+
+
 dash.register_page(__name__, title="URSA")
 
 WELCOME_TEXT = [
@@ -489,7 +508,7 @@ tabs = [
     dbc.Tab(
         lines,
         label = "Gráficas",
-        id="tab-plots",
+        id="tab-plots-hist",
         tab_id="tabPlots",
     ),
     dbc.Tab(
@@ -504,14 +523,14 @@ tabs = [
             ]
         ),
         label= "Info",
-        id="tab-info",
+        id="tab-info-hist",
         tab_id="tabInfo",
     ),
     dbc.Tab(
         html.Div([download_button]),
 
         label= "Descargables",
-        id="tab-download",
+        id="tab-download-hist",
         tab_id="tabDownload",
     ),
 ]
@@ -565,6 +584,27 @@ def update_translated_content(btn_lang_es, btn_lang_en, btn_lang_pt):
 
     return [translations[key][language] for key in translations.keys()]
 
+# --
+
+@callback(
+    [Output(key, 'label') for key in tab_translations.keys()], 
+    [Input('btn-lang-es', 'n_clicks'),
+     Input('btn-lang-en', 'n_clicks'),
+     Input('btn-lang-pt', 'n_clicks')]
+)
+def update_tab_labels(btn_lang_es, btn_lang_en, btn_lang_pt):
+    ctx = dash.callback_context
+
+    if not ctx.triggered:
+        language = 'es'  # Idioma predeterminado
+    else:
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        language = 'es' if button_id == 'btn-lang-es' else 'en' if button_id == 'btn-lang-en' else 'pt'
+
+    tab_labels = [tab_translations[key][language] for key in tab_translations.keys()]
+
+    return tab_labels  
+
 # ---
 
 
@@ -609,13 +649,23 @@ def download_file(n_clicks):
     Output("growth-location", "pathname"),
     Input("global-store-hash", "data"),
     Input("global-store-bbox-latlon", "data"),
-    Input("global-store-uc-latlon", "data"),
+    [Input("global-store-uc-latlon", "data"),
+    Input('btn-lang-es', 'n_clicks'),
+    Input('btn-lang-en', 'n_clicks'),
+    Input('btn-lang-pt', 'n_clicks')]
 )
-def generate_lines(id_hash, bbox_latlon, uc_latlon):
+def generate_lines(id_hash, bbox_latlon, uc_latlon, btn_lang_es, btn_lang_en, btn_lang_pt):
     error_triggered = False
 
     if id_hash is None:
         return [dash.no_update] * 11 + ["/"]
+    
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        language = 'es'  # Idioma predeterminado
+    else:
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        language = 'es' if button_id == 'btn-lang-es' else 'en' if button_id == 'btn-lang-en' else 'pt'
 
     path_cache = Path(f"./data/cache/{str(id_hash)}")
 
@@ -637,24 +687,70 @@ def generate_lines(id_hash, bbox_latlon, uc_latlon):
         path_cache=path_cache,
     )
 
+    translations = {
+        "es": {
+            "Urban Area": "Área urbana",
+            "Built Area": "Área construida",
+            "Population": "Población",
+            "Construction Density": "Densidad de construcción",
+            "Population Density": "Densidad de población",
+            "Population Density (Construction)": "Densidad de población (construcción)",
+            "Area (km²)": "Área (km²)",
+            "People per km²": "Personas por km²",
+            "People per km² of Construction": "Personas por km² de construcción",
+            "Fraction of Built Area": "Fracción de área construida"
+            
+        },
+        "en": {
+            "Urban Area": "Urban Area",
+            "Built Area": "Built Area",
+            "Population": "Population",
+            "Construction Density": "Construction Density",
+            "Population Density": "Population Density",
+            "Population Density (Construction)": "Population Density (Construction)",
+            "Area (km²)": "Area (km²)",
+            "People per km²": "People per km²",
+            "People per km² of Construction": "People per km² of Construction",
+            "Fraction of Built Area": "Fraction of Built Area"
+            
+        },
+        "pt": {
+            "Urban Area": "Área urbana",
+            "Built Area": "Área construída",
+            "Population": "População",
+            "Construction Density": "Densidade de construção",
+            "Population Density": "Densidade populacional",
+            "Population Density (Construction)": "Densidade populacional (construção)",
+            "Area (km²)": "Área (km²)",
+            "People per km²": "Pessoas por km²",
+            "People per km² of Construction": "Pessoas por km² de construção",
+            "Fraction of Built Area": "Fração da Área Construída"
+       
+        }
+    }
+
+
+    
     line_plot_params = [
         dict(
             y_cols=["urban_cluster_main", "urban_cluster_other"],
-            title="Área urbana",
-            ylabel="Área (km²)",
+            title=translations[language]["Urban Area"],
+            ylabel=translations[language]["Urban Area"],
             var_type="extensive",
         ),
         dict(
             y_cols=["built_cluster_main", "built_cluster_other"],
-            title="Área construida",
-            ylabel="Área (km²)",
+            title=translations[language]["Built Area"],
+            ylabel=translations[language]["Built Area"],
             var_type="extensive",
         ),
+        # 
+        
         dict(
-            y_cols=["pop_cluster_main", "pop_cluster_other"],
-            title="Población",
-            ylabel="Población",
-            var_type="extensive",
+        y_cols=["pop_cluster_main", "pop_cluster_other"],
+        title=translations[language]["Population"],
+        ylabel=translations[language]["Population"],
+        var_type="extensive",
         ),
         dict(
             y_cols=[
@@ -662,8 +758,8 @@ def generate_lines(id_hash, bbox_latlon, uc_latlon):
                 "built_density_cluster_other",
                 "built_density_cluster_all",
             ],
-            title="Densidad de construcción",
-            ylabel="Fracción de área construida",
+            title=translations[language]["Construction Density"],
+            ylabel=translations[language]["Fraction of Built Area"],
             var_type="intensive",
         ),
         dict(
@@ -672,8 +768,8 @@ def generate_lines(id_hash, bbox_latlon, uc_latlon):
                 "pop_density_cluster_other",
                 "pop_density_cluster_all",
             ],
-            title="Densidad de población",
-            ylabel="Personas por km²",
+            title=translations[language]["Population Density"],
+            ylabel=translations[language]["People per km²"],
             var_type="intensive",
         ),
         dict(
@@ -682,8 +778,8 @@ def generate_lines(id_hash, bbox_latlon, uc_latlon):
                 "pop_b_density_cluster_other",
                 "pop_b_density_cluster_all",
             ],
-            title="Densidad de población (construcción)",
-            ylabel="Personas por km² de construcción",
+            title=translations[language]["Population Density (Construction)"],
+            ylabel=translations[language]["People per km² of Construction"],
             var_type="intensive",
         ),
     ]
@@ -691,18 +787,18 @@ def generate_lines(id_hash, bbox_latlon, uc_latlon):
     plots = []
     for params in line_plot_params:
         try:
-            lines = ghsl.plot_growth(growth_df, **params)
+            lines = ghsl.plot_growth(growth_df, **params, language = language)
             plots.append(lines)
         except Exception:
             plots.append(dash.no_update)
             error_triggered = True
 
-    map1 = ghsl.plot_built_agg_img(smod, built, bbox_mollweide, centroid_mollweide)
-    map2 = ghsl.plot_smod_clusters(smod, bbox_latlon)
+    map1 = ghsl.plot_built_agg_img(smod, built, bbox_mollweide, centroid_mollweide, language = language)
+    map2 = ghsl.plot_smod_clusters(smod, bbox_latlon, language=language)
     map3 = ghsl.plot_built_year_img(
-        smod, built, bbox_latlon, bbox_mollweide, centroid_mollweide
+        smod, built, bbox_latlon, bbox_mollweide, centroid_mollweide, language = language
     )
-    map4 = ghsl.plot_pop_year_img(smod, pop, bbox_mollweide, centroid_mollweide)
+    map4 = ghsl.plot_pop_year_img(smod, pop, bbox_mollweide, centroid_mollweide, language = language)
 
     plots.append(map1)
     plots.append(map2)

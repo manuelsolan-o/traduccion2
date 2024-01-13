@@ -1,0 +1,49 @@
+,temperature_code,land_code,sum,Temperature,Land type
+0,1,10,0.0001784142906003,Muy frío,Árboles
+1,2,10,0.0085587272118603,Frío,Árboles
+2,3,10,0.0683225281257002,Ligeramente frío,Árboles
+3,4,10,0.0079955001823972,Templado,Árboles
+4,5,10,0.0026611896564615,Ligeramente cálido,Árboles
+5,6,10,0.0236992952621644,Caliente,Árboles
+6,7,10,0.0249376253069462,Muy caliente,Árboles
+7,1,20,8.921210890668796e-05,Muy frío,Matorral
+8,2,20,0.0179540526512576,Frío,Matorral
+9,3,20,0.2441132033812212,Ligeramente frío,Matorral
+10,4,20,0.1044440277492524,Templado,Matorral
+11,5,20,0.0861083139333766,Ligeramente cálido,Matorral
+12,6,20,0.009747632878716,Caliente,Matorral
+13,7,20,0.0028875456656816,Muy caliente,Matorral
+14,1,30,0.3156249008805525,Muy frío,Pradera
+15,2,30,0.0893104669836649,Frío,Pradera
+16,3,30,0.2732788041222098,Ligeramente frío,Pradera
+17,4,30,0.3816571287604881,Templado,Pradera
+18,5,30,0.4781427104874751,Ligeramente cálido,Pradera
+19,6,30,0.0612354691550746,Caliente,Pradera
+20,7,30,0.075731646996599,Muy caliente,Pradera
+21,1,40,0.0022303017130176,Muy frío,Cultivos
+22,2,40,0.0015326474868892,Frío,Cultivos
+23,3,40,0.1412877249321759,Ligeramente frío,Cultivos
+24,4,40,0.3911522456244214,Templado,Cultivos
+25,5,40,0.2578310519278629,Ligeramente cálido,Cultivos
+26,6,40,0.0156882269918932,Caliente,Cultivos
+27,7,40,0.022574915652473,Muy caliente,Cultivos
+28,1,50,0.0004460574309434,Muy frío,Construido
+29,2,50,0.0010748399532108,Frío,Construido
+30,3,50,0.0669677998272782,Ligeramente frío,Construido
+31,4,50,0.0432489175537394,Templado,Construido
+32,5,50,0.0503677274379747,Ligeramente cálido,Construido
+33,6,50,0.8720167509736936,Caliente,Construido
+34,7,50,0.860218117034106,Muy caliente,Construido
+35,1,60,0.0142737570303186,Muy frío,Desnudo / Vegetación escasa
+36,2,60,0.3834135348144651,Frío,Desnudo / Vegetación escasa
+37,3,60,0.186307290256497,Ligeramente frío,Desnudo / Vegetación escasa
+38,4,60,0.0699825053785293,Templado,Desnudo / Vegetación escasa
+39,5,60,0.1244445181922691,Ligeramente cálido,Desnudo / Vegetación escasa
+40,6,60,0.0143494637058595,Caliente,Desnudo / Vegetación escasa
+41,7,60,0.013650149344194,Muy caliente,Desnudo / Vegetación escasa
+42,1,90,0.6671573565456608,Muy frío,Humedal herbaceo
+43,2,90,0.4981557308986518,Frío,Humedal herbaceo
+44,3,90,0.0197226493549173,Ligeramente frío,Humedal herbaceo
+45,4,90,0.001519674751172,Templado,Humedal herbaceo
+46,5,90,0.00044448836458,Ligeramente cálido,Humedal herbaceo
+47,6,90,0.0032631610325984,Caliente,Humedal herbaceo
