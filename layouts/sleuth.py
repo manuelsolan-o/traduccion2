@@ -74,29 +74,56 @@ def calculate_coverage(worldcover, sleuth_predictions, start_year):
     result_df = result_df * 100
     return result_df
 
-def plot_coverage(lc_df, title):
-    # Eliminamos columnas que tengan cero
-    lc_df = lc_df.loc[:, (lc_df != 0).any(axis=0)]
+def plot_coverage(lc_df, title, language='es'):
+    translations = {
+        "es": {
+            "year": "Año",
+            "percentage": "Porcentaje",
+            "coverage_type": "Tipo de Cobertura",
+            "urban": "Urbano"
+        },
+        "en": {
+            "year": "Year",
+            "percentage": "Percentage",
+            "coverage_type": "Type of Coverage",
+            "urban": "Urban"
+        },
+        "pt": {
+            "year": "Ano",
+            "percentage": "Percentagem",
+            "coverage_type": "Tipo de Cobertura",
+            "urban": "Urbano"
+        }
+    }
+    
+    column_name_mapping = {
+        "Urban": translations[language]['urban'],
+        "Year": translations[language]['year']
+    }
 
-    # Ordenamos columnas
+    # Renombrar columnas
+    lc_df = lc_df.rename(columns=column_name_mapping)
+
+    # Eliminamos columnas que tengan cero
+    lc_df = lc_df.loc[:,(lc_df != 0).any(axis=0)]
+    
     column_names_sorted = lc_df.iloc[0].sort_values(ascending=False).index
     lc_df = lc_df[column_names_sorted]
 
-    # "Urban" se convierte en la primera columna
-    wanted_cols = ["Urban"] + [col for col in lc_df.columns if (col != "Urban") and (col != "Year")]
+    urban_translation = translations[language]['urban']
+    wanted_cols = [urban_translation] + [col for col in lc_df.columns if (col != urban_translation) and (col != translations[language]['year'])]
     lc_df = lc_df[wanted_cols]
-    lc_df["Año"] = list(range(2021, 2071))
+    lc_df[translations[language]['year']] = list(range(2021, 2071))
 
-    fig = px.area(lc_df, x="Año", y=wanted_cols, color_discrete_map=WORLD_COVER_COLOR, markers=True)
+    fig = px.area(lc_df, x=translations[language]['year'], y=wanted_cols, markers=True)
 
     fig.update_layout(
         title=title,
-        yaxis_title="Porcentaje",
-        xaxis_title="Año",
-        legend_title="Tipo de cobertura",
+        yaxis_title=translations[language]['percentage'],
+        xaxis_title=translations[language]['year'],
+        legend_title=translations[language]['coverage_type'],
         hovermode="x",
-    )
-
+        )
     fig.update_traces(hovertemplate="%{y:.2f}<extra></extra>")
 
     return fig
@@ -150,17 +177,31 @@ def help_text_translation(main_text_id, defecto, help_id):
 
 
 
-def create_parameter_row(idx, parameters):
+def create_parameter_row(idx, parameters, language='es'):
+ 
+    field_translations = {
+        "es": ["difusión", "reproducción", "expansión", "pendiente", "caminos"],
+        "en": ["diffusion", "reproduction", "expansion", "slope", "paths"],
+        "pt": ["difusão", "reprodução", "expansão", "inclinação", "caminhos"]
+    }
+
+    coefficient_translations = {
+        "es": "Valor del coeficiente de {}.",
+        "en": "Coefficient value of {}.",
+        "pt": "Valor do coeficiente de {}."
+    }
+
     cols = []
 
-    for field, name_es in zip(
-        FIELDS, ["difusión", "reproducción", "expansión", "pendiente", "caminos"]
-    ):
+    field_names = field_translations[language]
+    coefficient_text = coefficient_translations[language]
+
+    for field, name in zip(FIELDS, field_names):
         col = dbc.Col(
             dbc.InputGroup(
                 [
                     dbc.InputGroupText(
-                        help_text(field.title(), f"Valor del coeficiente de {name_es}.")
+                        help_text(field.title(), coefficient_text.format(name))
                     ),
                     dbc.Input(
                         type="number",
@@ -231,14 +272,29 @@ def load_sleuth_predictions(path_cache, id_hash, mode):
     return np.load(path_cache / local_filename)
 
 
-def plot_sleuth_predictions(grid, start_year, num_years):
+def plot_sleuth_predictions(grid, start_year, num_years, language='es'):
+    translations = {
+        "es": {
+            "year": "Año",
+            "urbanization_probability": "Probabilidad de Urbanización"
+        },
+        "en": {
+            "year": "Year",
+            "urbanization_probability": "Urbanization Probability"
+        },
+        "pt": {
+            "year": "Ano",
+            "urbanization_probability": "Probabilidade de Urbanização"
+        }
+    }
+
     sim_years = list(range(start_year + 1, start_year + num_years + 1))
 
     grid_plot = xr.DataArray(
         data=grid * 100,
-        dims=["Año", "y", "x"],
+        dims=[translations[language]['year'], "y", "x"],
         coords={
-            "Año": sim_years,
+            translations[language]['year']: sim_years,
             "y": list(range(grid.shape[1])),
             "x": list(range(grid.shape[2])),
         },
@@ -246,8 +302,8 @@ def plot_sleuth_predictions(grid, start_year, num_years):
 
     fig = px.imshow(
         grid_plot,
-        animation_frame="Año",
-        labels=dict(color="Probabilidad de urbanización"),
+        animation_frame=translations[language]['year'],
+        labels=dict(color=translations[language]['urbanization_probability']),
         zmin=0,
         zmax=100,
         aspect="equal",
@@ -257,34 +313,68 @@ def plot_sleuth_predictions(grid, start_year, num_years):
     return fig
 
 
-def summary(id_hash, urban_rasters, years):
+def summary(id_hash, urban_rasters, years, language = "es"):
+    
+    translations = {
+        "es": {
+        "year": "Año",
+        "urbanization_percentage": "Porcentaje de Urbanización",
+        "category": "Categoría",
+        "observations": "Observaciones",
+        "expansion": "Expansión",
+        "general_summary": "Resumen General",
+        "urban_area_increase": "+{0:.1f}% de aumento del área urbanizada 2070 vs. 2020.",
+        "modes": ["inercial", "acelerada", "controlada"]
+        },
+        "en": {
+        "year": "Year",
+        "urbanization_percentage": "Urbanization Percentage",
+        "category": "Category",
+        "observations": "Observations",
+        "expansion": "Expansion",
+        "general_summary": "General Summary",
+        "urban_area_increase": "+{0:.1f}% increase in urban area 2070 vs. 2020.",
+        "modes": ["inertial", "accelerated", "controlled"]
+        },
+        "pt": {
+        "year": "Ano",
+        "urbanization_percentage": "Percentagem de Urbanização",
+        "category": "Categoria",
+        "observations": "Observações",
+        "expansion": "Expansão",
+        "general_summary": "Resumo Geral",
+        "urban_area_increase": "+{0:.1f}% de aumento da área urbana 2070 vs. 2020.",
+        "modes": ["inercial", "acelerada", "controlada"]
+        }
+    }
+    
     path_cache = Path(f"./data/cache/{id_hash}")
-
     worldcover = np.load(path_cache / "worldcover.npy")
-
     start_year = 2020
     num_years = 50
 
-    modes = ["inercial", "acelerada", "controlada"]
     id_hash = str(id_hash)
-
     historical_years = np.array(years)
     historical_grids = np.array(urban_rasters)
-
+    
+    modes_translated = translations[language]['modes']
+    
     x = list(historical_years)
     y = [grid.sum() / grid.size for grid in historical_grids]
-    z = ["Observaciones"] * len(x)
-
+    z = [translations[language]['observations']] * len(x)
     final_y = y[-1]
 
     tabs = []
     coverage_graphs = []
-    for mode in modes:
-        grids = load_sleuth_predictions(path_cache, id_hash, mode=mode)
+    modes_normal = ["inercial", "acelerada", "controlada"]
+    
+    for indice,mode in enumerate(modes_translated):
+        
+        grids = load_sleuth_predictions(path_cache, id_hash, mode=modes_normal[indice])
 
         x_pred = list(range(start_year + 1, start_year + num_years + 1))
         y_pred = [grid.sum() / grid.size for grid in grids]
-        z_pred = [f"Expansión {mode}"] * (len(x_pred) + 1)
+        z_pred = [f"{translations[language]['expansion']} {mode}"] * len(x_pred)
 
         x_pred = [start_year] + x_pred
         y_pred = [final_y] + y_pred
@@ -301,7 +391,7 @@ def summary(id_hash, urban_rasters, years):
                         dbc.Row(
                             dbc.Col(
                                 dcc.Graph(
-                                    figure=plot_sleuth_predictions(grids, 2020, 50),
+                                    figure=plot_sleuth_predictions(grids, 2020, 50, language = language),
                                     responsive=True,
                                     style={"height": "60vh"},
                                 ),
@@ -311,44 +401,42 @@ def summary(id_hash, urban_rasters, years):
                     )
                 )
             ),
-            label=f"Expansión {mode}",
+            label=f"{translations[language]['expansion']}: {mode}",
         )
         tabs.append(tab)
+
         # Coverage
-        estimate_coverage = calculate_coverage(
-            worldcover, grids, start_year, 
-        )
-        fig_coverage = plot_coverage(estimate_coverage, f"Expansión {mode}")
-        # fig_coverage.write_image(f"./test/{mode}.eps", width=1200, height=600, scale=1.5)
+        estimate_coverage = calculate_coverage(worldcover, grids, start_year)
+        fig_coverage = plot_coverage(estimate_coverage, f"{translations[language]['expansion']}: {mode}", language = language)
         coverage_graphs.append(dcc.Graph(figure=fig_coverage))
 
     df = pd.DataFrame(
-        zip(x, y, z), columns=["Año", "Porcentaje de urbanización", "Categoría"]
+        zip(x, y, z), columns=[translations[language]['year'], translations[language]['urbanization_percentage'], translations[language]['category']]
     )
-    fig = px.line(df, x="Año", y="Porcentaje de urbanización", color="Categoría")
+    fig = px.line(df, x=translations[language]['year'], y=translations[language]['urbanization_percentage'], color=translations[language]['category'])
     fig.update_yaxes(tickformat=",.0%")
-    # fig.write_image("./test/lines.eps", width=1200, height=600, scale=1.5)
 
-    ## Cambio Porcentual por Escenario
-
-    base = df.loc[(df["Año"] == 2020) & (df["Categoría"] == "Observaciones")][
-        "Porcentaje de urbanización"
+    # Cambio Porcentual por Escenario
+    base = df.loc[(df[translations[language]['year']] == 2020) & (df[translations[language]['category']] == translations[language]['observations'])][    translations[language]['urbanization_percentage']
     ].values[0]
 
     columns = []
+    #for mode in modes_translated:
     for cat, color in zip(
-        ["acelerada", "inercial", "controlada"], ["danger", "warning", "success"]
+        modes_translated, ["danger", "warning", "success"]
     ):
-        cat = f"Expansión {cat}"
-        prediction = df.loc[(df["Año"] == 2070) & (df["Categoría"] == cat)][
-            "Porcentaje de urbanización"
-        ].values[0]
+        c = cat
+        cat = f"{translations[language]['expansion']} {cat}"#.capitalize()}"
+        #prediction = df.loc[df[translations[language]['category']] == cat][translations[language]['urbanization_percentage']].values[0]
+        prediction = df.loc[df[translations[language]['category']] == cat][translations[language]['urbanization_percentage']].values[0]
+
+        percentage_increase = round(((prediction - base) / base) * 100, 1)
         col = dbc.Col(dbc.Card(
             dbc.CardBody(
                 [
-                    html.H5(cat.title(), className="card-title"),
+                    html.H5(f"{translations[language]['expansion']}: {c}", className="card-title"),
                     html.P(
-                        f"+{round(((prediction - base)/ base) * 100, 1)}% de área urbanizada 2070 vs. 2020.",
+                        f"+{percentage_increase}% {translations[language]['urban_area_increase'].format(percentage_increase)}",
                         className="card-text",
                     ),
                 ]
@@ -356,11 +444,12 @@ def summary(id_hash, urban_rasters, years):
             color=color,
             inverse=True,
         ))
+        
         columns.append(col)
 
     cards = html.Div(dbc.Row(columns, className="mb-4"))
     all_elements = [cards] + coverage_graphs + [dcc.Graph(figure=fig)]
-    plot_tab = dbc.Tab(dbc.Card(dbc.CardBody(all_elements)), label="Resumen General")
+    plot_tab = dbc.Tab(dbc.Card(dbc.CardBody(all_elements)), label=translations[language]["general_summary"])
     tabs = [plot_tab] + tabs
     out = dbc.Tabs(tabs, active_tab="tab-0")
 

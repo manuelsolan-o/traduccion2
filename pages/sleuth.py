@@ -2819,20 +2819,30 @@ def download_predicted_rasters(n_clicks, data, id_hash):
 @callback(
     Output("container-parameters", "children", allow_duplicate=True),
     Input("btn-add-row", "n_clicks"),
+    Input("btn-lang-es", "n_clicks"),
+    Input("btn-lang-en", "n_clicks"),
+    Input("btn-lang-pt", "n_clicks"),
     State("container-parameters", "children"),
     State({"type": "memory-orig-coefficient", "field": dash.ALL}, "data"),
     prevent_initial_call=True,
 )
-def add_parameter_row(n_clicks, children, orig_coefficients):
+def add_parameter_row(n_clicks, children, orig_coefficients, btn_lang_es, btn_lang_en, btn_lang_pt):
     if n_clicks is None:
         return dash.no_update
+    
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        language = 'es'  # Idioma predeterminado
+    else:
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        language = 'es' if button_id == 'btn-lang-es' else 'en' if button_id == 'btn-lang-en' else 'pt'
 
     coefficients = {}
     for state, value in zip(dash.callback_context.states_list[1], orig_coefficients):
         coefficients[state["id"]["field"]] = value
 
     idx = (len(children) - 1) // 3
-    new_row = sl.create_parameter_row(idx, coefficients)
+    new_row = sl.create_parameter_row(idx, coefficients, language = language)
 
     new_children = children[:-1]
     new_children.append(dbc.Row(dbc.Col(html.H4(f"Escenario {idx + 1}"))))
@@ -2945,8 +2955,21 @@ def update_coefficient_stores(id_hash):
     ],
     Input("global-store-hash", "data"),
     Input("global-store-bbox-latlon", "data"),
+    Input('btn-lang-es', 'n_clicks'),
+    Input('btn-lang-en', 'n_clicks'),
+    Input('btn-lang-pt', 'n_clicks')
 )
-def download_data(id_hash, bbox_latlon):
+
+def download_data(id_hash, bbox_latlon, btn_lang_es, btn_lang_en, btn_lang_pt):
+    
+    ctx = dash.callback_context
+    
+    if not ctx.triggered:
+        language = 'es'  # Idioma predeterminado
+    else:
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        language = 'es' if button_id == 'btn-lang-es' else 'en' if button_id == 'btn-lang-en' else 'pt'
+        
     id_hash = str(id_hash)
     path_cache = PATH_CACHE / id_hash
 
@@ -2972,6 +2995,6 @@ def download_data(id_hash, bbox_latlon):
         if field == "urban":
             urban_rasters = raster
 
-    summary = sl.summary(id_hash, urban_rasters, years)
+    summary = sl.summary(id_hash, urban_rasters, years, language=language)
 
     return [years, summary] + out_attributes + out_rasters
