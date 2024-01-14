@@ -2817,10 +2817,10 @@ def download_predicted_rasters(n_clicks, data, id_hash):
 
 
 @callback(
-    Output("container-parameters", "children"),
+    Output("container-parameters", "children", allow_duplicate=True),
     Input("btn-add-row", "n_clicks"),
-    [State("container-parameters", "children"),
-    State({"type": "memory-orig-coefficient", "field": dash.ALL}, "data"),],
+    State("container-parameters", "children"),
+    State({"type": "memory-orig-coefficient", "field": dash.ALL}, "data"),
     prevent_initial_call=True,
 )
 def add_parameter_row(n_clicks, children, orig_coefficients):
@@ -2840,7 +2840,6 @@ def add_parameter_row(n_clicks, children, orig_coefficients):
     new_children.append(dbc.Row(dbc.Col([html.Hr()])))
     new_children.append(children[-1])
     return new_children
-
 
 
 @callback(
