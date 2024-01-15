@@ -2842,7 +2842,7 @@ def add_parameter_row(n_clicks, children, orig_coefficients, btn_lang_es, btn_la
         coefficients[state["id"]["field"]] = value
 
     idx = (len(children) - 1) // 3
-    new_row = sl.create_parameter_row(idx, coefficients, language = language)
+    new_row = sl.create_parameter_row(idx, coefficients, language=language)
 
     new_children = children[:-1]
     new_children.append(dbc.Row(dbc.Col(html.H4(f"Escenario {idx + 1}"))))

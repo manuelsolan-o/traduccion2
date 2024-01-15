@@ -331,9 +331,9 @@ def summary(id_hash, urban_rasters, years, language = "es"):
         "urbanization_percentage": "Urbanization Percentage",
         "category": "Category",
         "observations": "Observations",
-        "expansion": "Expansion",
+        "expansion": "Sprawl",
         "general_summary": "General Summary",
-        "urban_area_increase": "+{0:.1f}% increase in urban area 2070 vs. 2020.",
+        "urban_area_increase": "+{0:.1f}% increase in urbanized area 2070 vs. 2020.",
         "modes": ["inertial", "accelerated", "controlled"]
         },
         "pt": {
